@@ -1,7 +1,7 @@
 #![crate_name="cargo"]
 #![crate_type="rlib"]
 
-#![feature(macro_rules, phase, default_type_params, unboxed_closures)]
+#![feature(macro_rules, default_type_params, unboxed_closures)]
 #![feature(slicing_syntax, old_orphan_check, associated_types)]
 #![deny(unused)]
 #![cfg_attr(test, deny(warnings))]
@@ -11,7 +11,7 @@ extern crate "rustc-serialize" as rustc_serialize;
 extern crate regex;
 extern crate term;
 extern crate time;
-#[phase(plugin, link)] extern crate log;
+#[macro_use] extern crate log;
 
 extern crate curl;
 extern crate docopt;
