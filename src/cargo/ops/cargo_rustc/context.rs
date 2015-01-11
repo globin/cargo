@@ -75,7 +75,7 @@ impl<'a, 'b: 'a> Context<'a, 'b> {
             compilation: Compilation::new(root_pkg),
             build_state: Arc::new(BuildState::new(build_config.clone(), deps)),
             build_config: build_config,
-            exec_engine: Arc::new(box ProcessEngine as Box<ExecEngine>),
+            exec_engine: Arc::new(Box::new(ProcessEngine) as Box<ExecEngine>),
         })
     }
 

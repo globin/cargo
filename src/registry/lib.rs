@@ -143,8 +143,8 @@ impl Registry {
         };
         let tarball = try!(File::open(tarball).map_err(Error::Io));
         let size = stat.size as uint + header.get_ref().len();
-        let mut body = ChainedReader::new(vec![box header as Box<Reader>,
-                                               box tarball as Box<Reader>].into_iter());
+        let mut body = ChainedReader::new(vec![Box::new(header) as Box<Reader>,
+                                               Box::new(tarball) as Box<Reader>].into_iter());
 
         let url = format!("{}/api/v1/crates/new", self.host);
 

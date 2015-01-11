@@ -62,10 +62,10 @@ impl<T, E: Error> ChainError<T> for Result<T, E> {
     fn chain_error<E2, C>(self, callback: C) -> CargoResult<T>
                          where E2: CargoError, C: FnOnce() -> E2 {
         self.map_err(move |err| {
-            box ChainedError {
+            Box::new(ChainedError {
                 error: callback(),
-                cause: box err,
-            } as Box<CargoError>
+                cause: Box::new(err),
+            }) as Box<CargoError>
         })
     }
 }
@@ -75,7 +75,7 @@ impl<T> ChainError<T> for Option<T> {
                          where E: CargoError, C: FnOnce() -> E {
         match self {
             Some(t) => Ok(t),
-            None => Err(box callback() as Box<CargoError>),
+            None => Err(Box::new(callback()) as Box<CargoError>),
         }
     }
 }
@@ -184,7 +184,7 @@ impl CliError {
     }
 
     pub fn from_error<E: CargoError + 'static>(error: E, code: uint) -> CliError {
-        let error = box error as Box<CargoError>;
+        let error = Box::new(error) as Box<CargoError>;
         CliError::from_boxed(error, code)
     }
 
@@ -200,7 +200,7 @@ impl CliError {
 macro_rules! from_error {
     ($($p:ty,)*) => (
         $(impl FromError<$p> for Box<CargoError> {
-            fn from_error(t: $p) -> Box<CargoError> { box t }
+            fn from_error(t: $p) -> Box<CargoError> { Box::new(t) }
         })*
     )
 }
@@ -218,7 +218,7 @@ from_error! {
 }
 
 impl<E: Error> FromError<Human<E>> for Box<CargoError> {
-    fn from_error(t: Human<E>) -> Box<CargoError> { box t }
+    fn from_error(t: Human<E>) -> Box<CargoError> { Box::new(t) }
 }
 
 impl CargoError for semver::ReqParseError {}
@@ -271,37 +271,37 @@ pub fn process_error<S: Str>(msg: S,
 
 pub fn internal_error<S1: Str, S2: Str>(error: S1,
                                         detail: S2) -> Box<CargoError> {
-    box ConcreteCargoError {
+    Box::new(ConcreteCargoError {
         description: error.as_slice().to_string(),
         detail: Some(detail.as_slice().to_string()),
         cause: None,
         is_human: false
-    }
+    })
 }
 
 pub fn internal<S: Show>(error: S) -> Box<CargoError> {
-    box ConcreteCargoError {
+    Box::new(ConcreteCargoError {
         description: error.to_string(),
         detail: None,
         cause: None,
         is_human: false
-    }
+    })
 }
 
 pub fn human<S: Show>(error: S) -> Box<CargoError> {
-    box ConcreteCargoError {
+    Box::new(ConcreteCargoError {
         description: error.to_string(),
         detail: None,
         cause: None,
         is_human: true
-    }
+    })
 }
 
 pub fn caused_human<S: Show, E: Error>(error: S, cause: E) -> Box<CargoError> {
-    box ConcreteCargoError {
+    Box::new(ConcreteCargoError {
         description: error.to_string(),
         detail: None,
-        cause: Some(box cause as Box<Error>),
+        cause: Some(Box::new(cause) as Box<Error>),
         is_human: true
-    }
+    })
 }

@@ -94,7 +94,7 @@ impl Shell {
                 terminal: Colored(t),
                 config: config
             }).unwrap_or_else(|| {
-                Shell { terminal: NoColor(box stderr()), config: config }
+                Shell { terminal: NoColor(Box::new(stderr())), config: config }
             })
         } else {
             Shell { terminal: NoColor(out.inner), config: config }

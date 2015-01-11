@@ -155,13 +155,13 @@ pub fn process_executed<T>(result: CliResult<Option<T>>,
 
 pub fn shell(verbose: bool) -> MultiShell {
     let tty = stderr_raw().isatty();
-    let stderr = box stderr() as Box<Writer + Send>;
+    let stderr = Box::new(stderr()) as Box<Writer + Send>;
 
     let config = ShellConfig { color: true, verbose: verbose, tty: tty };
     let err = Shell::create(stderr, config);
 
     let tty = stdout_raw().isatty();
-    let stdout = box stdout() as Box<Writer + Send>;
+    let stdout = Box::new(stdout()) as Box<Writer + Send>;
 
     let config = ShellConfig { color: true, verbose: verbose, tty: tty };
     let out = Shell::create(stdout, config);

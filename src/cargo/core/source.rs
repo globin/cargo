@@ -195,16 +195,16 @@ impl SourceId {
     pub fn load<'a>(&self, config: &'a Config) -> Box<Source+'a> {
         log!(5, "loading SourceId; {}", self);
         match self.inner.kind {
-            Kind::Git(..) => box GitSource::new(self, config) as Box<Source+'a>,
+            Kind::Git(..) => Box::new(GitSource::new(self, config)) as Box<Source+'a>,
             Kind::Path => {
                 let path = match self.inner.url.to_file_path() {
                     Ok(p) => p,
                     Err(()) => panic!("path sources cannot be remote"),
                 };
-                box PathSource::new(&path, self) as Box<Source>
+                Box::new(PathSource::new(&path, self)) as Box<Source>
             },
             Kind::Registry => {
-                box RegistrySource::new(self, config) as Box<Source+'a>
+                Box::new(RegistrySource::new(self, config)) as Box<Source+'a>
             }
         }
     }

@@ -106,7 +106,7 @@ impl CargoError for PackageIdError {
 }
 
 impl FromError<PackageIdError> for Box<CargoError> {
-    fn from_error(t: PackageIdError) -> Box<CargoError> { box t }
+    fn from_error(t: PackageIdError) -> Box<CargoError> { Box::new(t) }
 }
 
 #[derive(PartialEq, Hash, Clone, RustcEncodable)]
