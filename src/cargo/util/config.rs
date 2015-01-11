@@ -282,8 +282,9 @@ pub fn all_configs(pwd: Path) -> CargoResult<HashMap<string::String, ConfigValue
     }
 }
 
-fn find_in_tree<T>(pwd: &Path,
-                   walk: |File| -> CargoResult<T>) -> CargoResult<T> {
+fn find_in_tree<T, F>(pwd: &Path, walk: F) -> CargoResult<T> where
+    F: Fn<File, CargoResult<T>>
+{
     let mut current = pwd.clone();
 
     loop {
@@ -303,8 +304,9 @@ fn find_in_tree<T>(pwd: &Path,
     Err(internal(""))
 }
 
-fn walk_tree(pwd: &Path,
-             walk: |File| -> CargoResult<()>) -> CargoResult<()> {
+fn walk_tree<F>(pwd: &Path, walk: F) -> CargoResult<()> where
+    F: Fn<File, CargoResult<()>>
+{
     let mut current = pwd.clone();
 
     loop {

@@ -29,7 +29,7 @@ pub struct MultiShell {
     verbose: bool
 }
 
-pub type Callback<'a> = |&mut MultiShell|:'a -> IoResult<()>;
+pub type Callback<'a> = Fn<&'a mut MultiShell, IoResult<()>>;
 
 struct UghWhyIsThisNecessary {
     inner: Box<Writer + Send>,
@@ -83,7 +83,7 @@ impl MultiShell {
     }
 }
 
-pub type ShellCallback<'a> = |&mut Shell|:'a -> IoResult<()>;
+pub type ShellCallback<'a> = Fn<&'a mut Shell, IoResult<()>>;
 
 impl Shell {
     pub fn create(out: Box<Writer + Send>, config: ShellConfig) -> Shell {

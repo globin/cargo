@@ -341,10 +341,9 @@ impl<'a> GitCheckout<'a> {
     }
 }
 
-fn with_authentication<T>(url: &str,
-                          cfg: &git2::Config,
-                          f: |&mut git2::Credentials| -> CargoResult<T>)
-                          -> CargoResult<T> {
+fn with_authentication<T, F>(url: &str, cfg: &git2::Config, f: F) -> CargoResult<T> where
+    F: Fn<&mut git2::Credentials, CargoResult<T>>
+{
     // Prepare the authentication callbacks.
     //
     // We check the `allowed` types of credentials, and we try to do as much as

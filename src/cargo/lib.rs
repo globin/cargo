@@ -131,8 +131,9 @@ pub fn call_main_without_stdin<T, V>(
     exec(flags, shell)
 }
 
-fn process<V>(callback: |&[String], &mut MultiShell| -> CliResult<Option<V>>)
-    where V: for<'a> Encodable<json::Encoder<'a>, fmt::Error>
+fn process<V, F>(callback: F)
+    where V: for<'a> Encodable<json::Encoder<'a>, fmt::Error>,
+          F: Fn<&[String], &mut MultiShell, CliResult<Option<V>>>
 {
     let mut shell = shell(true);
     process_executed(callback(os::args().as_slice(), &mut shell), &mut shell)

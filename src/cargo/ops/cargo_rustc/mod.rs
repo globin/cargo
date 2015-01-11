@@ -822,14 +822,18 @@ pub fn process(cmd: CommandType, pkg: &Package, target: &Target,
               .env(DynamicLibrary::envvar(), Some(search_path.as_slice())))
 }
 
-fn each_dep<'a>(pkg: &Package, cx: &'a Context, f: |&'a Package|) {
+fn each_dep<'a, F>(pkg: &Package, cx: &'a Context, f: F) where
+    F: Fn<&'a Package>
+{
     let mut visited = HashSet::new();
     let pkg = cx.get_package(pkg.get_package_id());
     visit_deps(pkg, cx, &mut visited, f);
 
     fn visit_deps<'a>(pkg: &'a Package, cx: &'a Context,
                       visited: &mut HashSet<&'a PackageId>,
-                      f: |&'a Package|) {
+                      f: F) where
+        F: Fn<&'a Package>
+    {
         if !visited.insert(pkg.get_package_id()) { return }
         f(pkg);
         let mut deps = match cx.resolve.deps(pkg.get_package_id()) {

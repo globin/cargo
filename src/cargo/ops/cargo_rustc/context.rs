@@ -363,7 +363,9 @@ impl Platform {
         }
     }
 
-    pub fn each_kind(self, f: |Kind|) {
+    pub fn each_kind<F>(self, f: F) where
+        F: Fn(Kind)
+    {
         match self {
             Platform::Target => f(Kind::Target),
             Platform::Plugin => f(Kind::Host),
