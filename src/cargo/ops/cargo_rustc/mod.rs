@@ -1,4 +1,3 @@
-use std::c_str::ToCStr;
 use std::collections::{HashSet, HashMap};
 use std::dynamic_lib::DynamicLibrary;
 use std::io::USER_RWX;
@@ -823,7 +822,7 @@ pub fn process(cmd: CommandType, pkg: &Package, target: &Target,
 }
 
 fn each_dep<'a, F>(pkg: &Package, cx: &'a Context, f: F) where
-    F: Fn<&'a Package>
+    F: Fn<&'a Package, ()>
 {
     let mut visited = HashSet::new();
     let pkg = cx.get_package(pkg.get_package_id());
@@ -832,7 +831,7 @@ fn each_dep<'a, F>(pkg: &Package, cx: &'a Context, f: F) where
     fn visit_deps<'a, InnerF>(pkg: &'a Package, cx: &'a Context,
                       visited: &mut HashSet<&'a PackageId>,
                       f: InnerF) where
-        InnerF: Fn<&'a Package>
+        InnerF: Fn<&'a Package, ()>
     {
         if !visited.insert(pkg.get_package_id()) { return }
         f(pkg);

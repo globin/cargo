@@ -1,5 +1,5 @@
 use std::collections::hash_map::Entry::{Occupied, Vacant};
-use std::hash::{Hash, Hasher};
+use std::hash::{Hash, Hasher, Writer};
 use std::hash::sip::SipHasher;
 use std::io::{self, fs, File, BufferedReader};
 use std::io::fs::PathExtensions;
@@ -221,7 +221,7 @@ fn is_fresh(loc: &Path, new_fingerprint: &str) -> CargoResult<bool> {
 
 /// Frob in the necessary data from the context to generate the real
 /// fingerprint.
-fn mk_fingerprint<T: Hash>(cx: &Context, data: &T) -> String {
+fn mk_fingerprint<T: Hash<H>, H: Hasher + Writer>(cx: &Context, data: &T) -> String {
     let hasher = SipHasher::new_with_keys(0,0);
     util::to_hex(hasher.hash(&(cx.config.rustc_version(), data)))
 }

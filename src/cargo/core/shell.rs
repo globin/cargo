@@ -29,8 +29,6 @@ pub struct MultiShell {
     verbose: bool
 }
 
-pub type Callback<'a> = Fn<&'a mut MultiShell, IoResult<()>>;
-
 struct UghWhyIsThisNecessary {
     inner: Box<Writer + Send>,
 }
@@ -56,12 +54,16 @@ impl MultiShell {
         self.out().say_status(status, message, GREEN)
     }
 
-    pub fn verbose(&mut self, callback: Callback) -> IoResult<()> {
+    pub fn verbose<'a, F>(&mut self, callback: F) -> IoResult<()> where
+        F: Fn<&'a mut MultiShell, IoResult<()>>
+    {
         if self.verbose { return callback(self) }
         Ok(())
     }
 
-    pub fn concise(&mut self, callback: Callback) -> IoResult<()> {
+    pub fn concise<'a, F>(&mut self, callback: F) -> IoResult<()> where
+        F: Fn<&'a mut MultiShell, IoResult<()>>
+    {
         if !self.verbose { return callback(self) }
         Ok(())
     }
@@ -83,8 +85,6 @@ impl MultiShell {
     }
 }
 
-pub type ShellCallback<'a> = Fn<&'a mut Shell, IoResult<()>>;
-
 impl Shell {
     pub fn create(out: Box<Writer + Send>, config: ShellConfig) -> Shell {
         let out = UghWhyIsThisNecessary { inner: out };
@@ -101,12 +101,16 @@ impl Shell {
         }
     }
 
-    pub fn verbose(&mut self, callback: ShellCallback) -> IoResult<()> {
+    pub fn verbose<'a, F>(&mut self, callback: F) -> IoResult<()> where
+        F: Fn<&'a mut Shell, IoResult<()>>
+    {
         if self.config.verbose { return callback(self) }
         Ok(())
     }
 
-    pub fn concise(&mut self, callback: ShellCallback) -> IoResult<()> {
+    pub fn concise<'a, F>(&mut self, callback: F) -> IoResult<()> where
+        F: Fn<&'a mut Shell, IoResult<()>>
+    {
         if !self.config.verbose { return callback(self) }
         Ok(())
     }

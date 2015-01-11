@@ -130,19 +130,20 @@ impl fmt::Show for ConfigValue {
     }
 }
 
-impl<E, S: Encoder<E>> Encodable<S, E> for ConfigValue {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        match *self {
-            CV::String(ref string, _) => string.encode(s),
-            CV::List(ref list) => {
-                let list: Vec<&string::String> = list.iter().map(|s| &s.0).collect();
-                list.encode(s)
-            }
-            CV::Table(ref table) => table.encode(s),
-            CV::Boolean(b, _) => b.encode(s),
-        }
-    }
-}
+//#[old_impl_check]
+//impl<S: Encoder> Encodable for ConfigValue {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //match *self {
+            //CV::String(ref string, _) => string.encode(s),
+            //CV::List(ref list) => {
+                //let list: Vec<&string::String> = list.iter().map(|s| &s.0).collect();
+                //list.encode(s)
+            //}
+            //CV::Table(ref table) => table.encode(s),
+            //CV::Boolean(b, _) => b.encode(s),
+        //}
+    //}
+//}
 
 impl ConfigValue {
     fn from_toml(path: &Path, toml: toml::Value) -> CargoResult<ConfigValue> {

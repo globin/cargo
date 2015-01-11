@@ -1,5 +1,5 @@
 use std::fmt::{self, Show, Formatter};
-use std::hash;
+use std::hash::{Hash, Hasher, Writer};
 use std::slice;
 use semver::Version;
 
@@ -39,23 +39,24 @@ struct SerializedPackage {
     manifest_path: String,
 }
 
-impl<E, S: Encoder<E>> Encodable<S, E> for Package {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        let manifest = self.get_manifest();
-        let summary = manifest.get_summary();
-        let package_id = summary.get_package_id();
+//#[old_impl_check]
+//impl<S: Encoder> Encodable for Package {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //let manifest = self.get_manifest();
+        //let summary = manifest.get_summary();
+        //let package_id = summary.get_package_id();
 
-        SerializedPackage {
-            name: package_id.get_name().to_string(),
-            version: package_id.get_version().to_string(),
-            dependencies: summary.get_dependencies().iter().map(|d| {
-                SerializedDependency::from_dependency(d)
-            }).collect(),
-            targets: manifest.get_targets().to_vec(),
-            manifest_path: self.manifest_path.display().to_string()
-        }.encode(s)
-    }
-}
+        //SerializedPackage {
+            //name: package_id.get_name().to_string(),
+            //version: package_id.get_version().to_string(),
+            //dependencies: summary.get_dependencies().iter().map(|d| {
+                //SerializedDependency::from_dependency(d)
+            //}).collect(),
+            //targets: manifest.get_targets().to_vec(),
+            //manifest_path: self.manifest_path.display().to_string()
+        //}.encode(s)
+    //}
+//}
 
 impl Package {
     pub fn new(manifest: Manifest,
@@ -131,8 +132,8 @@ impl PartialEq for Package {
 
 impl Eq for Package {}
 
-impl hash::Hash for Package {
-    fn hash(&self, into: &mut hash::sip::SipState) {
+impl<H: Hasher + Writer> Hash<H> for Package {
+    fn hash(&self, into: &mut H) {
         self.get_package_id().hash(into)
     }
 }

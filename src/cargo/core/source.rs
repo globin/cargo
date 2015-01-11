@@ -256,22 +256,24 @@ impl Ord for SourceId {
     }
 }
 
-impl<E, S: Encoder<E>> Encodable<S, E> for SourceId {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        if self.is_path() {
-            s.emit_option_none()
-        } else {
-           self.to_url().encode(s)
-        }
-    }
-}
+//#[old_impl_check]
+//impl<S: Encoder> Encodable for SourceId {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //if self.is_path() {
+            //s.emit_option_none()
+        //} else {
+           //self.to_url().encode(s)
+        //}
+    //}
+//}
 
-impl<E, D: Decoder<E>> Decodable<D, E> for SourceId {
-    fn decode(d: &mut D) -> Result<SourceId, E> {
-        let string: String = Decodable::decode(d).ok().expect("Invalid encoded SourceId");
-        Ok(SourceId::from_url(string))
-    }
-}
+//#[old_impl_check]
+//impl<D: Decoder> Decodable for SourceId {
+    //fn decode(d: &mut D) -> Result<SourceId, D::Error> {
+        //let string: String = Decodable::decode(d).ok().expect("Invalid encoded SourceId");
+        //Ok(SourceId::from_url(string))
+    //}
+//}
 
 impl Show for SourceId {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
@@ -314,7 +316,7 @@ impl PartialEq for SourceIdInner {
     }
 }
 
-impl<S: hash::Writer> hash::Hash<S> for SourceId {
+impl<S: hash::Writer + hash::Hasher> hash::Hash<S> for SourceId {
     fn hash(&self, into: &mut S) {
         self.inner.kind.hash(into);
         match *self.inner {

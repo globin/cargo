@@ -1,6 +1,6 @@
+use std::ffi::CString;
 use std::fmt::{self, Show, Formatter};
 use std::os;
-use std::c_str::{CString, ToCStr};
 use std::io::process::{Command, ProcessOutput, InheritFd};
 use std::collections::HashMap;
 
@@ -27,13 +27,13 @@ impl Show for ProcessBuilder {
 }
 
 impl ProcessBuilder {
-    pub fn arg<T: ToCStr>(mut self, arg: T) -> ProcessBuilder {
-        self.args.push(arg.to_c_str());
+    pub fn arg(mut self, arg: CString) -> ProcessBuilder {
+        self.args.push(arg);
         self
     }
 
-    pub fn args<T: ToCStr>(mut self, arguments: &[T]) -> ProcessBuilder {
-        self.args.extend(arguments.iter().map(|t| t.to_c_str()));
+    pub fn args(mut self, arguments: &[CString]) -> ProcessBuilder {
+        self.args.extend(arguments);
         self
     }
 
@@ -46,8 +46,8 @@ impl ProcessBuilder {
         self
     }
 
-    pub fn env<T: ToCStr>(mut self, key: &str, val: Option<T>) -> ProcessBuilder {
-        self.env.insert(key.to_string(), val.map(|t| t.to_c_str()));
+    pub fn env(mut self, key: &str, val: Option<CString>) -> ProcessBuilder {
+        self.env.insert(key.to_string(), val);
         self
     }
 
@@ -119,9 +119,9 @@ impl ProcessBuilder {
     }
 }
 
-pub fn process<T: ToCStr>(cmd: T) -> CargoResult<ProcessBuilder> {
+pub fn process(cmd: CString) -> CargoResult<ProcessBuilder> {
     Ok(ProcessBuilder {
-        program: cmd.to_c_str(),
+        program: cmd,
         args: Vec::new(),
         cwd: try!(os::getcwd()),
         env: HashMap::new(),

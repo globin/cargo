@@ -3,6 +3,7 @@
 
 #![feature(macro_rules, default_type_params, unboxed_closures)]
 #![feature(slicing_syntax, old_orphan_check, associated_types)]
+#![feature(int_uint, old_impl_check)]
 #![deny(unused)]
 #![cfg_attr(test, deny(warnings))]
 
@@ -62,15 +63,15 @@ pub mod ops;
 pub mod sources;
 pub mod util;
 
-pub trait RepresentsJSON : Decodable<json::Decoder, json::DecoderError> {}
-impl<T: Decodable<json::Decoder, json::DecoderError>> RepresentsJSON for T {}
+pub trait RepresentsJSON : Decodable {}
+impl<T: Decodable> RepresentsJSON for T {}
 
 pub fn execute_main<T, U, V>(
                         exec: fn(T, U, &mut MultiShell) -> CliResult<Option<V>>,
                         options_first: bool,
                         usage: &str)
-    where V: for<'a> Encodable<json::Encoder<'a>, fmt::Error>,
-          T: Decodable<docopt::Decoder, docopt::Error>,
+    where V: for<'a> Encodable,
+          T: Decodable,
           U: RepresentsJSON
 {
     process::<V>(|rest, shell| call_main(exec, shell, usage, rest, options_first));
@@ -82,8 +83,8 @@ pub fn call_main<T, U, V>(
             usage: &str,
             args: &[String],
             options_first: bool) -> CliResult<Option<V>>
-    where V: for<'a> Encodable<json::Encoder<'a>, fmt::Error>,
-          T: Decodable<docopt::Decoder, docopt::Error>,
+    where V: for<'a> Encodable,
+          T: Decodable,
           U: RepresentsJSON
 {
     let flags = try!(flags_from_args::<T>(usage, args, options_first));
@@ -96,8 +97,8 @@ pub fn execute_main_without_stdin<T, V>(
                                       exec: fn(T, &mut MultiShell) -> CliResult<Option<V>>,
                                       options_first: bool,
                                       usage: &str)
-    where V: for<'a> Encodable<json::Encoder<'a>, fmt::Error>,
-          T: Decodable<docopt::Decoder, docopt::Error>
+    where V: for<'a> Encodable,
+          T: Decodable
 {
     process::<V>(|rest, shell| call_main_without_stdin(exec, shell, usage, rest,
                                                        options_first));
@@ -108,8 +109,8 @@ pub fn execute_main_with_args_and_without_stdin<T, V>(
                                       options_first: bool,
                                       usage: &str,
                                       args: &[String])
-    where V: for<'a> Encodable<json::Encoder<'a>, fmt::Error>,
-          T: Decodable<docopt::Decoder, docopt::Error>
+    where V: for<'a> Encodable,
+          T: Decodable
 {
     let mut shell = shell(true);
 
@@ -124,16 +125,16 @@ pub fn call_main_without_stdin<T, V>(
             usage: &str,
             args: &[String],
             options_first: bool) -> CliResult<Option<V>>
-    where V: for<'a> Encodable<json::Encoder<'a>, fmt::Error>,
-          T: Decodable<docopt::Decoder, docopt::Error>
+    where V: for<'a> Encodable,
+          T: Decodable
 {
     let flags = try!(flags_from_args::<T>(usage, args, options_first));
     exec(flags, shell)
 }
 
-fn process<V, F>(callback: F)
-    where V: for<'a> Encodable<json::Encoder<'a>, fmt::Error>,
-          F: Fn<&[String], &mut MultiShell, CliResult<Option<V>>>
+fn process<'a, V, F>(callback: F)
+    where V: for<'a> Encodable,
+          F: Fn<(&'a [String], &'a mut MultiShell), CliResult<Option<V>>>
 {
     let mut shell = shell(true);
     process_executed(callback(os::args().as_slice(), &mut shell), &mut shell)
@@ -141,7 +142,7 @@ fn process<V, F>(callback: F)
 
 pub fn process_executed<T>(result: CliResult<Option<T>>,
                            shell: &mut MultiShell)
-    where T: for<'a> Encodable<json::Encoder<'a>, fmt::Error>
+    where T: for<'a> Encodable
 {
     match result {
         Err(e) => handle_error(e, shell),
@@ -246,7 +247,8 @@ pub fn version() -> String {
 
 fn flags_from_args<'a, T>(usage: &str, args: &[String],
                           options_first: bool) -> CliResult<T>
-                          where T: Decodable<docopt::Decoder, docopt::Error> {
+                          where T: Decodable
+{
     struct CargoDocoptError { err: docopt::Error }
     impl Error for CargoDocoptError {
         fn description(&self) -> &str {

@@ -30,13 +30,14 @@ struct EncodableGitRemote {
     url: String,
 }
 
-impl<E, S: Encoder<E>> Encodable<S, E> for GitRemote {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        EncodableGitRemote {
-            url: self.url.to_string()
-        }.encode(s)
-    }
-}
+//#[old_impl_check]
+//impl<S: Encoder> Encodable for GitRemote {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //EncodableGitRemote {
+            //url: self.url.to_string()
+        //}.encode(s)
+    //}
+//}
 
 /// GitDatabase is a local clone of a remote repository's database. Multiple
 /// GitCheckouts can be cloned from this GitDatabase.
@@ -52,14 +53,15 @@ pub struct EncodableGitDatabase {
     path: String,
 }
 
-impl<E, S: Encoder<E>> Encodable<S, E> for GitDatabase {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        EncodableGitDatabase {
-            remote: self.remote.clone(),
-            path: self.path.display().to_string()
-        }.encode(s)
-    }
-}
+//#[old_impl_check]
+//impl<S: Encoder> Encodable for GitDatabase {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //EncodableGitDatabase {
+            //remote: self.remote.clone(),
+            //path: self.path.display().to_string()
+        //}.encode(s)
+    //}
+//}
 
 /// GitCheckout is a local checkout of a particular revision. Calling
 /// `clone_into` with a reference will resolve the reference into a revision,
@@ -78,18 +80,19 @@ pub struct EncodableGitCheckout {
     revision: String,
 }
 
-impl<'a, E, S: Encoder<E>> Encodable<S, E> for GitCheckout<'a> {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        EncodableGitCheckout {
-            location: self.location.display().to_string(),
-            revision: self.revision.to_string(),
-            database: EncodableGitDatabase {
-                remote: self.database.remote.clone(),
-                path: self.database.path.display().to_string(),
-            },
-        }.encode(s)
-    }
-}
+//#[old_impl_check]
+//impl<'a, S: Encoder> Encodable for GitCheckout<'a> {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //EncodableGitCheckout {
+            //location: self.location.display().to_string(),
+            //revision: self.revision.to_string(),
+            //database: EncodableGitDatabase {
+                //remote: self.database.remote.clone(),
+                //path: self.database.path.display().to_string(),
+            //},
+        //}.encode(s)
+    //}
+//}
 
 // Implementations
 
@@ -341,8 +344,8 @@ impl<'a> GitCheckout<'a> {
     }
 }
 
-fn with_authentication<T, F>(url: &str, cfg: &git2::Config, f: F) -> CargoResult<T> where
-    F: Fn<&mut git2::Credentials, CargoResult<T>>
+fn with_authentication<'a, T, F>(url: &str, cfg: &git2::Config, f: F) -> CargoResult<T> where
+    F: Fn<&'a mut git2::Credentials<'a>, CargoResult<T>>
 {
     // Prepare the authentication callbacks.
     //

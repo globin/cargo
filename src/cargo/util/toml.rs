@@ -285,15 +285,16 @@ pub struct TomlVersion {
     version: semver::Version,
 }
 
-impl<E, D: Decoder<E>> Decodable<D, E> for TomlVersion {
-    fn decode(d: &mut D) -> Result<TomlVersion, E> {
-        let s = try!(d.read_str());
-        match s.as_slice().to_semver() {
-            Ok(s) => Ok(TomlVersion { version: s }),
-            Err(e) => Err(d.error(e.as_slice())),
-        }
-    }
-}
+//#[old_impl_check]
+//impl<D: Decoder> Decodable for TomlVersion {
+    //fn decode(d: &mut D) -> Result<TomlVersion, D::Error> {
+        //let s = try!(d.read_str());
+        //match s.as_slice().to_semver() {
+            //Ok(s) => Ok(TomlVersion { version: s }),
+            //Err(e) => Err(d.error(e.as_slice())),
+        //}
+    //}
+//}
 
 impl TomlProject {
     pub fn to_package_id(&self, source_id: &SourceId) -> CargoResult<PackageId> {
@@ -771,10 +772,10 @@ fn normalize(libs: &[TomlLibTarget],
         }
     }
 
-    fn bin_targets<F>(dst: &mut Vec<Target>, bins: &[TomlBinTarget],
+    fn bin_targets<'a, F>(dst: &mut Vec<Target>, bins: &[TomlBinTarget],
                    dep: TestDep, metadata: &Metadata, profiles: &TomlProfiles,
                    default: F) where
-        F: Fn<&TomlBinTarget, String>
+        F: Fn<&'a TomlBinTarget, String>
     {
         for bin in bins.iter() {
             let path = bin.path.clone().unwrap_or_else(|| {
@@ -815,9 +816,9 @@ fn normalize(libs: &[TomlLibTarget],
         }
     }
 
-    fn example_targets<F>(dst: &mut Vec<Target>, examples: &[TomlExampleTarget],
+    fn example_targets<'a, F>(dst: &mut Vec<Target>, examples: &[TomlExampleTarget],
                        profiles: &TomlProfiles, default: F) where
-        F: Fn<&TomlExampleTarget, String>
+        F: Fn<&'a TomlExampleTarget, String>
     {
         for ex in examples.iter() {
             let path = ex.path.clone().unwrap_or_else(|| PathValue::String(default(ex)));
@@ -833,10 +834,10 @@ fn normalize(libs: &[TomlLibTarget],
         }
     }
 
-    fn test_targets<F>(dst: &mut Vec<Target>, tests: &[TomlTestTarget],
+    fn test_targets<'a, F>(dst: &mut Vec<Target>, tests: &[TomlTestTarget],
                     metadata: &Metadata, profiles: &TomlProfiles,
                     default: F) where
-        F: Fn<&TomlTestTarget, String>
+        F: Fn<&'a TomlTestTarget, String>
     {
         for test in tests.iter() {
             let path = test.path.clone().unwrap_or_else(|| {
@@ -857,10 +858,10 @@ fn normalize(libs: &[TomlLibTarget],
         }
     }
 
-    fn bench_targets<F>(dst: &mut Vec<Target>, benches: &[TomlBenchTarget],
+    fn bench_targets<'a, F>(dst: &mut Vec<Target>, benches: &[TomlBenchTarget],
                      metadata: &Metadata, profiles: &TomlProfiles,
                      default: F) where
-        F: Fn<&TomlBenchTarget, String>
+        F: Fn<&'a TomlBenchTarget, String>
     {
         for bench in benches.iter() {
             let path = bench.path.clone().unwrap_or_else(|| {

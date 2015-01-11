@@ -7,7 +7,7 @@
 use std::collections::hash_set::HashSet;
 use std::collections::hash_map::HashMap;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
-use std::hash::Hash;
+use std::hash::{Hash, Hasher, Writer};
 
 pub use self::Freshness::{Fresh, Dirty};
 
@@ -47,7 +47,7 @@ pub enum Freshness {
 }
 
 /// A trait for discovering the dependencies of a piece of data.
-pub trait Dependency<C>: Hash + Eq + Clone {
+pub trait Dependency<C, H: Hasher + Writer>: Hash<H> + Eq + Clone {
     fn dependencies(&self, cx: &C) -> Vec<Self>;
 }
 
@@ -57,7 +57,8 @@ impl Freshness {
     }
 }
 
-impl<C, K: Dependency<C>, V> DependencyQueue<K, V> {
+#[old_impl_check]
+impl<C, K: Dependency<C, H>, V, H: Hasher + Writer> DependencyQueue<K, V> {
     /// Creates a new dependency queue with 0 packages.
     pub fn new() -> DependencyQueue<K, V> {
         DependencyQueue {

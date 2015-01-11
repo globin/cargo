@@ -65,22 +65,23 @@ pub struct SerializedManifest {
     build: Option<Vec<String>>,     // TODO: deprecated, remove
 }
 
-impl<E, S: Encoder<E>> Encodable<S, E> for Manifest {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        SerializedManifest {
-            name: self.summary.get_name().to_string(),
-            version: self.summary.get_version().to_string(),
-            dependencies: self.summary.get_dependencies().iter().map(|d| {
-                SerializedDependency::from_dependency(d)
-            }).collect(),
-            targets: self.targets.clone(),
-            target_dir: self.target_dir.display().to_string(),
-            doc_dir: self.doc_dir.display().to_string(),
-            // TODO: deprecated, remove
-            build: if self.build.len() == 0 { None } else { Some(self.build.clone()) },
-        }.encode(s)
-    }
-}
+//#[old_impl_check]
+//impl<S: Encoder> Encodable for Manifest {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //SerializedManifest {
+            //name: self.summary.get_name().to_string(),
+            //version: self.summary.get_version().to_string(),
+            //dependencies: self.summary.get_dependencies().iter().map(|d| {
+                //SerializedDependency::from_dependency(d)
+            //}).collect(),
+            //targets: self.targets.clone(),
+            //target_dir: self.target_dir.display().to_string(),
+            //doc_dir: self.doc_dir.display().to_string(),
+            //// TODO: deprecated, remove
+            //build: if self.build.len() == 0 { None } else { Some(self.build.clone()) },
+        //}.encode(s)
+    //}
+//}
 
 #[derive(Show, Clone, PartialEq, Hash, RustcEncodable, Copy)]
 pub enum LibKind {
@@ -329,7 +330,7 @@ impl Profile {
     }
 }
 
-impl<H: hash::Writer> hash::Hash<H> for Profile {
+impl<H: hash::Hasher + hash::Writer> hash::Hash<H> for Profile {
     fn hash(&self, into: &mut H) {
         // Be sure to match all fields explicitly, but ignore those not relevant
         // to the actual hash of a profile.
@@ -377,23 +378,24 @@ pub struct SerializedTarget {
     metadata: Option<Metadata>
 }
 
-impl<E, S: Encoder<E>> Encodable<S, E> for Target {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        let kind = match self.kind {
-            TargetKind::Lib(ref kinds) => kinds.iter().map(|k| k.crate_type()).collect(),
-            TargetKind::Bin => vec!("bin"),
-            TargetKind::Example => vec!["example"],
-        };
+//#[old_impl_check]
+//impl<S: Encoder> Encodable for Target {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //let kind = match self.kind {
+            //TargetKind::Lib(ref kinds) => kinds.iter().map(|k| k.crate_type()).collect(),
+            //TargetKind::Bin => vec!("bin"),
+            //TargetKind::Example => vec!["example"],
+        //};
 
-        SerializedTarget {
-            kind: kind,
-            name: self.name.clone(),
-            src_path: self.src_path.display().to_string(),
-            profile: self.profile.clone(),
-            metadata: self.metadata.clone()
-        }.encode(s)
-    }
-}
+        //SerializedTarget {
+            //kind: kind,
+            //name: self.name.clone(),
+            //src_path: self.src_path.display().to_string(),
+            //profile: self.profile.clone(),
+            //metadata: self.metadata.clone()
+        //}.encode(s)
+    //}
+//}
 
 impl Show for Target {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {

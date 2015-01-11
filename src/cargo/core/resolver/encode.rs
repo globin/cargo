@@ -100,37 +100,39 @@ pub struct EncodablePackageId {
     source: Option<SourceId>
 }
 
-impl<E, S: Encoder<E>> Encodable<S, E> for EncodablePackageId {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        let mut out = format!("{} {}", self.name, self.version);
-        if let Some(ref s) = self.source {
-            out.push_str(format!(" ({})", s.to_url()).as_slice());
-        }
-        out.encode(s)
-    }
-}
+//#[old_impl_check]
+//impl<S: Encoder> Encodable for EncodablePackageId {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //let mut out = format!("{} {}", self.name, self.version);
+        //if let Some(ref s) = self.source {
+            //out.push_str(format!(" ({})", s.to_url()).as_slice());
+        //}
+        //out.encode(s)
+    //}
+//}
 
-impl<E, D: Decoder<E>> Decodable<D, E> for EncodablePackageId {
-    fn decode(d: &mut D) -> Result<EncodablePackageId, E> {
-        let string: String = try!(Decodable::decode(d));
-        let regex = Regex::new(r"^([^ ]+) ([^ ]+)(?: \(([^\)]+)\))?$").unwrap();
-        let captures = regex.captures(string.as_slice())
-                            .expect("invalid serialized PackageId");
+//#[old_impl_check]
+//impl<D: Decoder> Decodable for EncodablePackageId {
+    //fn decode(d: &mut D) -> Result<EncodablePackageId, D::Error> {
+        //let string: String = try!(Decodable::decode(d));
+        //let regex = Regex::new(r"^([^ ]+) ([^ ]+)(?: \(([^\)]+)\))?$").unwrap();
+        //let captures = regex.captures(string.as_slice())
+                            //.expect("invalid serialized PackageId");
 
-        let name = captures.at(1).unwrap();
-        let version = captures.at(2).unwrap();
+        //let name = captures.at(1).unwrap();
+        //let version = captures.at(2).unwrap();
 
-        let source = captures.at(3);
+        //let source = captures.at(3);
 
-        let source_id = source.map(|s| SourceId::from_url(s.to_string()));
+        //let source_id = source.map(|s| SourceId::from_url(s.to_string()));
 
-        Ok(EncodablePackageId {
-            name: name.to_string(),
-            version: version.to_string(),
-            source: source_id
-        })
-    }
-}
+        //Ok(EncodablePackageId {
+            //name: name.to_string(),
+            //version: version.to_string(),
+            //source: source_id
+        //})
+    //}
+//}
 
 impl EncodablePackageId {
     fn to_package_id(&self, default_source: &SourceId) -> CargoResult<PackageId> {
@@ -141,24 +143,25 @@ impl EncodablePackageId {
     }
 }
 
-impl<E, S: Encoder<E>> Encodable<S, E> for Resolve {
-    fn encode(&self, s: &mut S) -> Result<(), E> {
-        let mut ids: Vec<&PackageId> = self.graph.iter().collect();
-        ids.sort();
+//#[old_impl_check]
+//impl<S: Encoder> Encodable for Resolve {
+    //fn encode(&self, s: &mut S) -> Result<(), S::Error> {
+        //let mut ids: Vec<&PackageId> = self.graph.iter().collect();
+        //ids.sort();
 
-        let encodable = ids.iter().filter_map(|&id| {
-            if self.root == *id { return None; }
+        //let encodable = ids.iter().filter_map(|&id| {
+            //if self.root == *id { return None; }
 
-            Some(encodable_resolve_node(id, &self.root, &self.graph))
-        }).collect::<Vec<EncodableDependency>>();
+            //Some(encodable_resolve_node(id, &self.root, &self.graph))
+        //}).collect::<Vec<EncodableDependency>>();
 
-        EncodableResolve {
-            package: Some(encodable),
-            root: encodable_resolve_node(&self.root, &self.root, &self.graph),
-            metadata: self.metadata.clone(),
-        }.encode(s)
-    }
-}
+        //EncodableResolve {
+            //package: Some(encodable),
+            //root: encodable_resolve_node(&self.root, &self.root, &self.graph),
+            //metadata: self.metadata.clone(),
+        //}.encode(s)
+    //}
+//}
 
 fn encodable_resolve_node(id: &PackageId, root: &PackageId,
                           graph: &Graph<PackageId>) -> EncodableDependency {

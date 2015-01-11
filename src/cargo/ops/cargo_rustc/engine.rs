@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use std::c_str::{CString, ToCStr};
 use std::io::process::ProcessOutput;
+use std::ffi::CString;
 use std::fmt::{self, Show, Formatter};
 
 use util::{self, CargoResult, ProcessError, ProcessBuilder};
@@ -51,13 +51,13 @@ impl CommandPrototype {
         &self.ty
     }
 
-    pub fn arg<T: ToCStr>(mut self, arg: T) -> CommandPrototype {
-        self.args.push(arg.to_c_str());
+    pub fn arg(mut self, arg: CString) -> CommandPrototype {
+        self.args.push(arg);
         self
     }
 
-    pub fn args<T: ToCStr>(mut self, arguments: &[T]) -> CommandPrototype {
-        self.args.extend(arguments.iter().map(|t| t.to_c_str()));
+    pub fn args(mut self, arguments: &[CString]) -> CommandPrototype {
+        self.args.extend(arguments);
         self
     }
 
@@ -74,8 +74,8 @@ impl CommandPrototype {
         &self.cwd
     }
 
-    pub fn env<T: ToCStr>(mut self, key: &str, val: Option<T>) -> CommandPrototype {
-        self.env.insert(key.to_string(), val.map(|t| t.to_c_str()));
+    pub fn env(mut self, key: &str, val: Option<CString>) -> CommandPrototype {
+        self.env.insert(key.to_string(), val);
         self
     }
 

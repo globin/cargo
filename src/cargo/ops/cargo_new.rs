@@ -19,19 +19,20 @@ pub struct NewOptions<'a> {
     pub path: &'a str,
 }
 
-impl<E, D: Decoder<E>> Decodable<D, E> for VersionControl {
-    fn decode(d: &mut D) -> Result<VersionControl, E> {
-        Ok(match try!(d.read_str()).as_slice() {
-            "git" => VersionControl::Git,
-            "hg" => VersionControl::Hg,
-            "none" => VersionControl::NoVcs,
-            n => {
-                let err = format!("could not decode '{}' as version control", n);
-                return Err(d.error(err.as_slice()));
-            }
-        })
-    }
-}
+//#[old_impl_check]
+//impl<D: Decoder> Decodable for VersionControl {
+    //fn decode(d: &mut D) -> Result<VersionControl, D::Error> {
+        //Ok(match try!(d.read_str()).as_slice() {
+            //"git" => VersionControl::Git,
+            //"hg" => VersionControl::Hg,
+            //"none" => VersionControl::NoVcs,
+            //n => {
+                //let err = format!("could not decode '{}' as version control", n);
+                //return Err(d.error(err.as_slice()));
+            //}
+        //})
+    //}
+//}
 
 struct CargoNewConfig {
     name: Option<String>,

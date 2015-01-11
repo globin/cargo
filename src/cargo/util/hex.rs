@@ -10,7 +10,7 @@ pub fn to_hex(num: u64) -> String {
     writer.get_ref().to_hex()
 }
 
-pub fn short_hash<H: Hash>(hashable: &H) -> String {
+pub fn short_hash<H: Hash<SipHasher>>(hashable: &H) -> String {
     let hasher = SipHasher::new_with_keys(0, 0);
     to_hex(hasher.hash(hashable))
 }

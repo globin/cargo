@@ -1,4 +1,3 @@
-use std::c_str::ToCStr;
 use std::collections::HashMap;
 use std::fmt;
 use std::io::fs::PathExtensions;

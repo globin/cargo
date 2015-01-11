@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use std::collections::hash_map::HashMap;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
+use std::hash;
 use std::sync::TaskPool;
 use std::sync::mpsc::{channel, Sender, Receiver};
 use term::color::YELLOW;
@@ -230,7 +231,7 @@ impl<'a, 'b> JobQueue<'a, 'b> {
     }
 }
 
-impl<'a> Dependency<(&'a Resolve, &'a PackageSet)>
+impl<'a, H: hash::Hasher + hash::Writer> Dependency<(&'a Resolve, &'a PackageSet), H>
     for (&'a PackageId, Stage)
 {
     fn dependencies(&self, &(resolve, packages): &(&'a Resolve, &'a PackageSet))

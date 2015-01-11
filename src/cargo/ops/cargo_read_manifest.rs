@@ -62,8 +62,8 @@ pub fn read_packages(path: &Path,
     }
 }
 
-fn walk<F>(path: &Path, callback: F) -> CargoResult<()> where
-    F: Fn<&Path, CargoResult<bool>>
+fn walk<'a, F>(path: &'a Path, callback: F) -> CargoResult<()> where
+    F: Fn<&'a Path, CargoResult<bool>>
 {
     if path.is_dir() {
         let continues = try!(callback(path));

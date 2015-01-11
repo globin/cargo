@@ -1,5 +1,5 @@
 use std::fmt;
-use std::hash::Hash;
+use std::hash::{Hash, Hasher, Writer};
 use std::collections::hash_set::HashSet;
 use std::collections::hash_map::{HashMap, Keys};
 use std::collections::hash_map::Entry::{Occupied, Vacant};
@@ -17,7 +17,8 @@ enum Mark {
 pub type Nodes<'a, N> = Keys<'a, N, HashSet<N>>;
 pub type Edges<'a, N> = Iter<'a, N>;
 
-impl<N: Eq + Hash + Clone> Graph<N> {
+#[old_impl_check]
+impl<N: Eq + Hash<H> + Clone, H: Hasher + Writer> Graph<N> {
     pub fn new() -> Graph<N> {
         Graph { nodes: HashMap::new() }
     }
@@ -72,7 +73,8 @@ impl<N: Eq + Hash + Clone> Graph<N> {
     }
 }
 
-impl<N: fmt::Show + Eq + Hash> fmt::Show for Graph<N> {
+#[old_impl_check]
+impl<N: fmt::Show + Eq + Hash<H>, H: Hasher + Writer> fmt::Show for Graph<N> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         try!(writeln!(fmt, "Graph {{"));
 
@@ -90,12 +92,15 @@ impl<N: fmt::Show + Eq + Hash> fmt::Show for Graph<N> {
     }
 }
 
-impl<N: Eq + Hash> PartialEq for Graph<N> {
+#[old_impl_check]
+impl<N: Eq + Hash<H>, H: Hasher + Writer> PartialEq for Graph<N> {
     fn eq(&self, other: &Graph<N>) -> bool { self.nodes.eq(&other.nodes) }
 }
-impl<N: Eq + Hash> Eq for Graph<N> {}
+#[old_impl_check]
+impl<N: Eq + Hash<H>, H: Hasher + Writer> Eq for Graph<N> {}
 
-impl<N: Eq + Hash + Clone> Clone for Graph<N> {
+#[old_impl_check]
+impl<N: Eq + Hash<H> + Clone, H: Hasher + Writer> Clone for Graph<N> {
     fn clone(&self) -> Graph<N> {
         Graph { nodes: self.nodes.clone() }
     }

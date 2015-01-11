@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use std::c_str::ToCStr;
 use std::dynamic_lib::DynamicLibrary;
+use std::ffi::CString;
 use semver::Version;
 
 use core::{PackageId, Package};
@@ -68,15 +68,15 @@ impl Compilation {
     }
 
     /// See `process`.
-    pub fn target_process<T: ToCStr>(&self, cmd: T, pkg: &Package)
-                                     -> CargoResult<CommandPrototype> {
-        self.process(CommandType::Target(cmd.to_c_str()), pkg)
+    pub fn target_process(&self, cmd: CString, pkg: &Package)
+                          -> CargoResult<CommandPrototype> {
+        self.process(CommandType::Target(cmd), pkg)
     }
 
     /// See `process`.
-    pub fn host_process<T: ToCStr>(&self, cmd: T, pkg: &Package)
-                                   -> CargoResult<CommandPrototype> {
-        self.process(CommandType::Host(cmd.to_c_str()), pkg)
+    pub fn host_process(&self, cmd: CString, pkg: &Package)
+                        -> CargoResult<CommandPrototype> {
+        self.process(CommandType::Host(cmd), pkg)
     }
 
     /// Prepares a new process with an appropriate environment to run against
