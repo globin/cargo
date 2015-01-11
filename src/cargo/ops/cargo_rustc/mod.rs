@@ -829,10 +829,10 @@ fn each_dep<'a, F>(pkg: &Package, cx: &'a Context, f: F) where
     let pkg = cx.get_package(pkg.get_package_id());
     visit_deps(pkg, cx, &mut visited, f);
 
-    fn visit_deps<'a>(pkg: &'a Package, cx: &'a Context,
+    fn visit_deps<'a, InnerF>(pkg: &'a Package, cx: &'a Context,
                       visited: &mut HashSet<&'a PackageId>,
-                      f: F) where
-        F: Fn<&'a Package>
+                      f: InnerF) where
+        InnerF: Fn<&'a Package>
     {
         if !visited.insert(pkg.get_package_id()) { return }
         f(pkg);
