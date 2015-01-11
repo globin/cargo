@@ -1,6 +1,6 @@
 use term::{Terminal, TerminfoTerminal, color};
 use term::color::{Color, BLACK, RED, GREEN, YELLOW};
-use term::attr::{Attr, Bold};
+use term::Attr::{self, Bold};
 use std::io::{IoResult, stderr};
 use std::fmt::Show;
 
